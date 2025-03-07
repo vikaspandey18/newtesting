@@ -1,28 +1,23 @@
-FROM node:20 AS builder
+FROM node:18 AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy all project files
 COPY . .
 
-# Build the Next.js static site
-RUN npm run build && npm run export
+# Ensure Next.js builds for static export
+RUN npm run build
 
-# Use an Nginx base image for serving static files
+# Use Nginx to serve static files
 FROM nginx:alpine
 
-# Copy the generated static files to the Nginx HTML directory
+# Copy the static output from Next.js
 COPY --from=builder /app/out /usr/share/nginx/html
 
-# Expose the default Nginx port
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
