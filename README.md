@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Step-by-Step Instructions
 
-## Getting Started
+1. Create Your Next.js Project: If you haven't already, create your Next.js project and navigate to its directory.
 
-First, run the development server:
+2. Create the Dockerfile: In the root of your Next.js project, create a file named Dockerfile and add the following content:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Step 1: Build the Next.js application
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+FROM node:16 AS builder
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Set the working directory
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+WORKDIR /app
 
-## Learn More
+# Copy package.json and package-lock.json
 
-To learn more about Next.js, take a look at the following resources:
+COPY package\*.json ./
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Install dependencies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+RUN npm install
 
-## Deploy on Vercel
+# Copy the rest of the application code
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+COPY . .
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Build the Next.js application
+
+RUN npm run build
+
+# Step 2: Serve the application using Nginx
+
+FROM nginx:alpine
+
+# Copy the built application from the builder stage
+
+COPY --from=builder /app/out /usr/share/nginx/html
+
+# Copy the Nginx configuration file
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose the port that Nginx will run on
+
+EXPOSE 80
+
+# Start Nginx
+
+CMD ["nginx", "-g", "daemon off;"]
+
+3. Create the Nginx Configuration File: In the same directory, create a file named nginx.conf and add the following content:
+
+server {
+listen 80;
+
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri $uri/ /index.html;
+    }
+
+}
+
+4. Build the Docker Image: Open your terminal, navigate to your project directory, and run the following command to build the Docker image:
+
+docker build -t my-nextjs-app .
+
+5. Run the Docker Container: After the image is built, you can run the container with:
+
+docker run -p 80:80 my-nextjs-app
+
+Deploying to AWS EC2
+Launch an EC2 Instance: Use an Amazon Machine Image (AMI) that supports Docker (e.g., Amazon Linux 2).
+SSH into Your EC2 Instance: Use your terminal to connect to your EC2 instance.
+Install Docker: If Docker is not already installed, you can install it with the following commands
+
+Build and Run Your Docker Container on EC2: SSH into your EC2 instance and navigate to your project directory. Then run the following commands:
+
+cd nextjs-project
+docker build -t my-nextjs-app .
+docker run -p 80:80 my-nextjs-app
