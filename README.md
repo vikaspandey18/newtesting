@@ -50,7 +50,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 3. Create the Nginx Configuration File: In the same directory, create a file named nginx.conf and add the following content:
-
+```
 server {
 listen 80;
 
@@ -60,22 +60,24 @@ listen 80;
     }
 
 }
+```
 
 4. Build the Docker Image: Open your terminal, navigate to your project directory, and run the following command to build the Docker image:
-
+```
 docker build -t my-nextjs-app .
-
+```
 5. Run the Docker Container: After the image is built, you can run the container with:
-
+```
 docker run -p 80:80 my-nextjs-app
-
+```
 Deploying to AWS EC2
 Launch an EC2 Instance: Use an Amazon Machine Image (AMI) that supports Docker (e.g., Amazon Linux 2).
 SSH into Your EC2 Instance: Use your terminal to connect to your EC2 instance.
 Install Docker: If Docker is not already installed, you can install it with the following commands
 
 Build and Run Your Docker Container on EC2: SSH into your EC2 instance and navigate to your project directory. Then run the following commands:
-
+```
 cd nextjs-project
 docker build -t my-nextjs-app .
 docker run -p 80:80 my-nextjs-app
+```
