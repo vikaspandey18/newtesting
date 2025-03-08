@@ -3,7 +3,7 @@ Step-by-Step Instructions
 1. Create Your Next.js Project: If you haven't already, create your Next.js project and navigate to its directory.
 
 2. Create the Dockerfile: In the root of your Next.js project, create a file named Dockerfile and add the following content:
-
+```
 # Step 1: Build the Next.js application
 
 FROM node:16 AS builder
@@ -47,6 +47,7 @@ EXPOSE 80
 # Start Nginx
 
 CMD ["nginx", "-g", "daemon off;"]
+```
 
 3. Create the Nginx Configuration File: In the same directory, create a file named nginx.conf and add the following content:
 
